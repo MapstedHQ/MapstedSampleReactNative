@@ -5,7 +5,7 @@
  * @format
  */
 
-import { launchMapActivity } from 'mapsted-react-native';
+import { launchMapActivity } from '@mapsted/maps-react-native';
 import React from 'react';
 import {
   Button,

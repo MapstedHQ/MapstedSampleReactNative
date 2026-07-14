@@ -8,8 +8,3 @@
 #   http://developer.android.com/guide/developing/tools/proguard.html
 
 # Add any project specific keep options here:
-
--keep interface com.mapsted.** { *; }    
--keep public class com.mapsted.** { public protected *; }
--keep interface com.carto.** { *; }
--keep public class com.carto.** { public protected *; }
