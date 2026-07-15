@@ -1,117 +1,95 @@
-# Mapsted Package Installation
+# Mapsted React Native — Sample App
 
-## Getting Started
+A runnable sample for the Mapsted **React Native** library
+[`@mapsted/maps-react-native`](https://www.npmjs.com/package/@mapsted/maps-react-native)
+(built on the native Mapsted SDK **26.7.1**). This repository is already configured with the
+correct sources, versions, and settings below — clone it, install, and run.
 
->**Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/set-up-your-environment) instructions till "Creating a new application" step, before proceeding.
+> Using the SDK requires a valid Mapsted commercial licence. This sample ships with a **demo**
+> licence for the demo property (Square One). For the full integration guide, see the
+> [Mapsted React Native documentation](https://developer.mapsted.com/mobile-sdk/getting-started/react-native-getting-started/).
 
-### Step 1
-- Open terminal and run below command
+## Requirements
+
+| | Minimum |
+|---|---|
+| React Native | **0.76** (certified on **0.76.9**) — 0.74 and older cannot consume the 26.7.1 Android artifacts |
+| Android | `minSdkVersion` **26**; a **Material Components** app theme; Kotlin **1.9.25** (RN 0.76.9 default) with `-Xskip-metadata-version-check` |
+| iOS | deployment target **16.0**; CocoaPods; **New Architecture disabled** |
+| Node | 18+ |
+
+## Getting started
+
+### Step 1 — Install JS dependencies
 
 ```sh
 npm install
-npm install mapsted-react-native
 ```
-Please find more details here : https://www.npmjs.com/package/mapsted-react-native
 
-## prerequisites
+The Mapsted wrapper (`@mapsted/maps-react-native@26.7.2`) is already declared in `package.json`
+and resolves from the public npm registry — no extra install command is needed.
 
-### iOS
-- Project/ios/Podfile Add source file on top
+### Step 2 — iOS pods
+
+This sample's `ios/Podfile` is already set up with everything the SDK needs:
+
+- the **26.7.1** spec source `source 'https://github.com/MapstedHQ/podspec.git'`
+  (the universal device+simulator XCFrameworks live here — **not** in `Mapsted/podspec-simulator`, which has no 26.7.1);
+- `platform :ios, '16.0'`;
+- **`ENV['RCT_NEW_ARCH_ENABLED'] = '0'`** — the Mapsted bridge is a legacy (paper) native module, and
+  RN 0.76 turns the New Architecture on by default, which leaves the module unregistered and makes the
+  map silently fail to open. Disabling it (parity with Android's `newArchEnabled=false`) is required.
+
+Install the pods:
 
 ```sh
-source 'https://cdn.cocoapods.org/'
-
-# To run in simulator add below source target
-source 'https://github.com/Mapsted/podspec-simulator.git'
-
-# To run in device add below source target
-source 'https://github.com/Mapsted/podspec.git'
+cd ios && pod install
 ```
 
-- Project/ios/Podfile set use frameworks in your app target
+The iOS licence (`ios/*.key`) is added to *Copy Bundle Resources*, and the required
+`Info.plist` usage-description keys (`NSLocationWhenInUseUsageDescription`,
+`NSBluetoothAlwaysUsageDescription`, `NSMotionUsageDescription`) are already present — iOS
+terminates the app on location access without them.
+
+### Step 3 — Android
+
+The Android project is already configured with `minSdkVersion 26`, a Material Components theme, the
+Kotlin `-Xskip-metadata-version-check` flag, and the demo licence in
+`android/app/src/main/assets/`.
+
+### Step 4 — Run
+
+Start Metro in its own terminal, then run the app:
 
 ```sh
-use_frameworks!
-```
-
-- Add license file in Resources folder `your_ios_license.key`
-
-### Android
-
-- Add license file in Assets folder('/app/src/main/assets') `your_android_license.key`
-
-## Step 2: Update Pods
-
-- go to ios directory and install pods with below command.
-```sh
-cd ios
-pod install
-```
-
-
-## Step 3: Start your Application
-
-Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
-
-### For Android
-
-```bash
-# using npm
+# Android
 npm run android
 
-# OR using Yarn
-yarn android
-```
-
-### For iOS
-
-```bash
-# using npm
+# iOS
 npm run ios
-
-# OR using Yarn
-yarn ios
 ```
 
-If everything is set up _correctly_, you should see your new app running in your _Android Emulator_ or _iOS Simulator_ shortly provided you have set up your emulator/simulator correctly.
+## Using the map
 
-This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
+This sample (`App.tsx`) demonstrates the fullscreen entry point, `launchMapActivity()`, which opens
+the native SDK's own map screen:
 
-## Step 4: Initialize Mapsted map SDK
+```tsx
+import { launchMapActivity } from '@mapsted/maps-react-native';
 
-We need to call below function to initialize the map SDK.
+<Button title="Launch Map" onPress={launchMapActivity} />
+```
 
-**launchMapActivity()** 
+For **production** surfaces, the recommended integration is the embedded `MapstedMapView` component,
+which is certified on real arm64 hardware and auto-plots the property indoors on mount. The
+fullscreen `launchMapActivity()` currently carries two SDK-side robustness issues on some Android
+devices (a rare load-time crash and an on-close ANR) that do not affect the embedded
+`MapstedMapView`. See the
+[Mapsted React Native documentation](https://developer.mapsted.com/mobile-sdk/getting-started/react-native-getting-started/)
+for the full `MapstedMapView` guide (embedded map, routing, and turn-by-turn navigation).
 
+## Licensing
 
-## Step 5: Modifying your App
-
-Now that you have successfully run the app, let's modify it.
-
-1. Open `App.tsx` in your text editor of choice and edit some lines.
-2. For **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Developer Menu** (<kbd>Ctrl</kbd> + <kbd>M</kbd> (on Window and Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (on macOS)) to see your changes!
-
-   For **iOS**: Hit <kbd>Cmd ⌘</kbd> + <kbd>R</kbd> in your iOS Simulator to reload the app and see your changes!
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [Introduction to React Native](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you can't get this to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+Mapsted licences are issued for a specific OS **and** bundle id (an Android licence will not load on
+iOS). Replace the bundled demo keys with the licence issued for your own bundle id. Use of the SDK
+requires a valid Mapsted commercial licence.
