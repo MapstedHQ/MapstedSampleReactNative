@@ -1,13 +1,21 @@
 # Resolve react_native_pods.rb with node to allow for hoisting
 source 'https://cdn.cocoapods.org/'
-source 'https://github.com/Mapsted/podspec-simulator.git'
+# 26.7.1 SDK pods (mapsted-sdk-map / -map-ui) ship as universal XCFrameworks (device + simulator)
+# from the MapstedHQ device spec repo. The old `Mapsted/podspec-simulator` source carried no 26.7.1
+# and its simulator-only slice cannot run on a real iPhone. (S14 GATE-0 verified: only MapstedHQ/podspec has 26.7.1.)
+source 'https://github.com/MapstedHQ/podspec.git'
 require Pod::Executable.execute_command('node', ['-p',
   'require.resolve(
     "react-native/scripts/react_native_pods.rb",
     {paths: [process.argv[1]]},
   )', __dir__]).strip
 
-platform :ios, min_ios_version_supported
+# Mapsted SDK 26.7.1 requires iOS 16 (XCFramework deployment_target 16.0); RN 0.76 default is 15.1.
+# The Mapsted SDK bridge is a legacy (paper) native module; RN 0.76 defaults the iOS New Architecture ON,
+# which makes the legacy `Mapsted` module unreachable (launchMapActivity silently no-ops). Disable New Arch
+# on iOS for parity with Android (newArchEnabled=false). Verified: full map render on device w/ this off.
+ENV['RCT_NEW_ARCH_ENABLED'] = '0'
+platform :ios, '16.0'
 prepare_react_native_project!
 
 linkage = ENV['USE_FRAMEWORKS']
@@ -39,5 +47,14 @@ target 'dempMapstedSampleApp' do
       :mac_catalyst_enabled => false,
       # :ccache_enabled => true
     )
+    # Resource bundles (e.g. *_privacy, SDWebImage/SSZipArchive resource bundles) must NOT be code-signed;
+    # under manual signing / CI archiving they otherwise fail with "requires a development team".
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+        if config.build_settings['PRODUCT_TYPE'] == 'com.apple.product-type.bundle'
+          config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
+        end
+      end
+    end
   end
 end
