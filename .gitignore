@@ -5,4 +5,7 @@ ios/Pods
 /ios/Pods/mapsted-sdk-core/MapstedCore.framework
 android/.gradle
 android/app/build
-android/.gradle/8.6
+android/.gradle/8.6.DS_Store
+*.DS_Store
+.xcode.env.local
+**/ios/Flutter/ephemeral/
