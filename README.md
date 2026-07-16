@@ -82,9 +82,8 @@ import { launchMapActivity } from '@mapsted/maps-react-native';
 
 For **production** surfaces, the recommended integration is the embedded `MapstedMapView` component,
 which is certified on real arm64 hardware and auto-plots the property indoors on mount. The
-fullscreen `launchMapActivity()` currently carries two SDK-side robustness issues on some Android
-devices (a rare load-time crash and an on-close ANR) that do not affect the embedded
-`MapstedMapView`. See the
+fullscreen `launchMapActivity()` opens the native SDK's own full-screen map screen and is well
+suited to quick previews and simple full-screen use. See the
 [Mapsted React Native documentation](https://developer.mapsted.com/mobile-sdk/getting-started/react-native-getting-started/)
 for the full `MapstedMapView` guide (embedded map, routing, and turn-by-turn navigation).
 
