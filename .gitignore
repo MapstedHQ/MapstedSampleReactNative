@@ -9,3 +9,6 @@ android/.gradle/8.6.DS_Store
 *.DS_Store
 .xcode.env.local
 **/ios/Flutter/ephemeral/
+
+# Local Android SDK path, written on each machine
+android/local.properties
